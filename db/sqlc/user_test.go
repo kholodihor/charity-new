@@ -6,27 +6,45 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
+	"github.com/kholodihor/charity/util"
 )
 
 func TestCreateUser(t *testing.T) {
-	user := createRandomUser(t, testStore)
-
 	t.Run("Create user with valid data", func(t *testing.T) {
+		email, name := util.RandomUserParams()
+		arg := CreateUserParams{
+			Email: email,
+			Name:  name,
+		}
+
+		user, err := testStore.CreateUser(context.Background(), arg)
+		require.NoError(t, err)
 		require.NotEmpty(t, user)
 		require.NotZero(t, user.ID)
 		require.NotZero(t, user.CreatedAt)
-		require.Equal(t, "test@example.com", user.Email)
-		require.Equal(t, pgtype.Text{String: "Test User", Valid: true}, user.Name)
-		require.Zero(t, user.Balance)
+		require.Equal(t, email, user.Email)
+		require.Equal(t, name, user.Name)
+		require.Equal(t, int64(1000000), user.Balance, "User should have $10,000 (1,000,000 cents) default balance")
 	})
 
 	t.Run("Create user with duplicate email", func(t *testing.T) {
-		arg := CreateUserParams{
-			Email: user.Email, // Duplicate email
-			Name:  pgtype.Text{String: "Another User", Valid: true},
+		// First create a user with random email
+		email := util.RandomEmail()
+		arg1 := CreateUserParams{
+			Email: email,
+			Name:  pgtype.Text{String: "First User", Valid: true},
 		}
 
-		_, err := testStore.CreateUser(context.Background(), arg)
+		_, err := testStore.CreateUser(context.Background(), arg1)
+		require.NoError(t, err)
+
+		// Try to create another user with the same email
+		arg2 := CreateUserParams{
+			Email: email, // Same email
+			Name:  pgtype.Text{String: "Second User", Valid: true},
+		}
+
+		_, err = testStore.CreateUser(context.Background(), arg2)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "duplicate key value")
 	})

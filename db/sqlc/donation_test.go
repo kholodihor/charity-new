@@ -152,17 +152,7 @@ func testDonateToGoal(t *testing.T, store Store, anonymous bool) {
 	require.Equal(t, goal.TargetAmount, result.Goal.TargetAmount)
 	require.Equal(t, initialAmount+amount, result.Goal.CollectedAmount, "Goal collected amount should be updated correctly")
 
-	// Clean up test data
-	// Note: We don't have a direct DeleteDonation method, but the database
-	// should handle cascading deletes based on foreign key constraints
-
-	// Delete the goal (which should cascade to donations)
-	err = testStore.DeleteGoal(context.Background(), goal.ID)
-	require.NoError(t, err, "Failed to clean up test goal")
-
-	// Delete the user if this was a non-anonymous donation
-	if !anonymous {
-		err = testStore.DeleteUser(context.Background(), user.ID)
-		require.NoError(t, err, "Failed to clean up test user")
-	}
+	// Note: We skip cleanup since there's no DeleteDonation method
+	// and foreign key constraints prevent deleting goals/users with donations.
+	// The test database will be cleaned up between test runs.
 }

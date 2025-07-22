@@ -18,8 +18,6 @@ func RandomInt(min, max int64) int64 {
 	return n.Int64() + min
 }
 
-
-
 // RandomString generates a random string of length n
 func RandomString(n int) string {
 	const alphabet = "abcdefghijklmnopqrstuvwxyz"
