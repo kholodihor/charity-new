@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -95,4 +96,11 @@ func RandomDonationParams(userID, goalID int64) (donorID pgtype.Int8, amount int
 	return pgtype.Int8{Int64: userID, Valid: userID > 0},
 		RandomInt(100, 10000), // $1.00 to $100.00
 		false
+}
+
+// RandomEventParams generates random event creation parameters
+func RandomEventParams() (name string, place string, date time.Time) {
+	return "Event " + RandomString(8),
+		"Venue " + RandomString(6) + ", " + RandomString(8) + " City",
+		time.Now().Add(time.Duration(RandomInt(1, 365)) * 24 * time.Hour) // 1-365 days from now
 }

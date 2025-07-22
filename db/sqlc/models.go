@@ -20,6 +20,23 @@ type Donation struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+type Event struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Place string `json:"place"`
+	// event date and time
+	Date      time.Time `json:"date"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// tracks which users have booked which events
+type EventBooking struct {
+	ID       int64     `json:"id"`
+	UserID   int64     `json:"user_id"`
+	EventID  int64     `json:"event_id"`
+	BookedAt time.Time `json:"booked_at"`
+}
+
 type Goal struct {
 	ID          int64       `json:"id"`
 	Title       string      `json:"title"`
