@@ -45,5 +45,30 @@ jobs:
       - name: Run migrations
         run: make migrateup
 
-      - name: Test
-        run: make test
+      - name: Install SQLC
+        run: go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+
+      - name: Install gomock
+        run: go install github.com/golang/mock/mockgen@latest
+
+      - name: Generate SQLC code
+        run: sqlc generate
+
+      - name: Generate mocks
+        run: mockgen -package mockdb -destination db/mock/store.go github.com/kholodihor/charity/db/sqlc Store
+
+      - name: Test database layer
+        run: go test -v -short ./db/sqlc
+
+      - name: Test new features
+        run: |
+          go test -v -short ./api -run "TestCreateAnonymousDonationAPI"
+          go test -v -short ./api -run "TestDonationLimits"
+          go test -v -short ./api -run "TestRateLimiting"
+
+      - name: Test core API features
+        run: |
+          go test -v -short ./api -run "TestCreateUserAPI"
+          go test -v -short ./api -run "TestLoginUserAPI"
+          go test -v -short ./api -run "TestCreateGoalAPI"
+          go test -v -short ./api -run "TestCreateEventAPI"
