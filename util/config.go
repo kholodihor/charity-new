@@ -1,15 +1,22 @@
 package util
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
-// Config stores all configuration of the application
+// Config stores all configuration of the application.
+// The values are read by viper from a config file or environment variable.
 type Config struct {
-	DBSource string `mapstructure:"DB_SOURCE"`
+	DBDriver            string        `mapstructure:"DB_DRIVER"`
+	DBSource            string        `mapstructure:"DB_SOURCE"`
+	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
+	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
-// LoadConfig reads configuration from file or environment variables
+// LoadConfig reads configuration from file or environment variables.
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
@@ -19,10 +26,7 @@ func LoadConfig(path string) (config Config, err error) {
 
 	err = viper.ReadInConfig()
 	if err != nil {
-		// It's okay if config file doesn't exist, we'll use env vars
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return
-		}
+		return
 	}
 
 	err = viper.Unmarshal(&config)

@@ -48,6 +48,146 @@ func (q *Queries) CreateDonation(ctx context.Context, arg CreateDonationParams) 
 	return i, err
 }
 
+const getDonation = `-- name: GetDonation :one
+SELECT id, user_id, goal_id, amount, is_anonymous, created_at FROM donations
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetDonation(ctx context.Context, id int64) (Donation, error) {
+	row := q.db.QueryRow(ctx, getDonation, id)
+	var i Donation
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.GoalID,
+		&i.Amount,
+		&i.IsAnonymous,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listDonations = `-- name: ListDonations :many
+SELECT id, user_id, goal_id, amount, is_anonymous, created_at FROM donations
+ORDER BY created_at DESC
+LIMIT $1
+OFFSET $2
+`
+
+type ListDonationsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListDonations(ctx context.Context, arg ListDonationsParams) ([]Donation, error) {
+	rows, err := q.db.Query(ctx, listDonations, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Donation{}
+	for rows.Next() {
+		var i Donation
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.GoalID,
+			&i.Amount,
+			&i.IsAnonymous,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listDonationsByGoal = `-- name: ListDonationsByGoal :many
+SELECT id, user_id, goal_id, amount, is_anonymous, created_at FROM donations
+WHERE goal_id = $1
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3
+`
+
+type ListDonationsByGoalParams struct {
+	GoalID int64 `json:"goal_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListDonationsByGoal(ctx context.Context, arg ListDonationsByGoalParams) ([]Donation, error) {
+	rows, err := q.db.Query(ctx, listDonationsByGoal, arg.GoalID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Donation{}
+	for rows.Next() {
+		var i Donation
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.GoalID,
+			&i.Amount,
+			&i.IsAnonymous,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listDonationsByUser = `-- name: ListDonationsByUser :many
+SELECT id, user_id, goal_id, amount, is_anonymous, created_at FROM donations
+WHERE user_id = $1
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3
+`
+
+type ListDonationsByUserParams struct {
+	UserID pgtype.Int8 `json:"user_id"`
+	Limit  int32       `json:"limit"`
+	Offset int32       `json:"offset"`
+}
+
+func (q *Queries) ListDonationsByUser(ctx context.Context, arg ListDonationsByUserParams) ([]Donation, error) {
+	rows, err := q.db.Query(ctx, listDonationsByUser, arg.UserID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Donation{}
+	for rows.Next() {
+		var i Donation
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.GoalID,
+			&i.Amount,
+			&i.IsAnonymous,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateGoalCollectedAmount = `-- name: UpdateGoalCollectedAmount :exec
 UPDATE goals
 SET collected_amount = collected_amount + $2

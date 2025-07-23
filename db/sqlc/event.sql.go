@@ -152,24 +152,38 @@ func (q *Queries) IsEventBooked(ctx context.Context, arg IsEventBookedParams) (b
 }
 
 const listEventBookings = `-- name: ListEventBookings :many
-SELECT eb.id, eb.user_id, eb.event_id, eb.booked_at, u.email as user_email, u.name as user_name
+SELECT 
+  eb.id,
+  eb.user_id,
+  eb.event_id,
+  eb.booked_at,
+  u.name as user_name,
+  u.email as user_email
 FROM event_bookings eb
 JOIN users u ON eb.user_id = u.id
 WHERE eb.event_id = $1
-ORDER BY eb.booked_at ASC
+ORDER BY eb.booked_at DESC
+LIMIT $2
+OFFSET $3
 `
+
+type ListEventBookingsParams struct {
+	EventID int64 `json:"event_id"`
+	Limit   int32 `json:"limit"`
+	Offset  int32 `json:"offset"`
+}
 
 type ListEventBookingsRow struct {
 	ID        int64       `json:"id"`
 	UserID    int64       `json:"user_id"`
 	EventID   int64       `json:"event_id"`
 	BookedAt  time.Time   `json:"booked_at"`
-	UserEmail string      `json:"user_email"`
 	UserName  pgtype.Text `json:"user_name"`
+	UserEmail string      `json:"user_email"`
 }
 
-func (q *Queries) ListEventBookings(ctx context.Context, eventID int64) ([]ListEventBookingsRow, error) {
-	rows, err := q.db.Query(ctx, listEventBookings, eventID)
+func (q *Queries) ListEventBookings(ctx context.Context, arg ListEventBookingsParams) ([]ListEventBookingsRow, error) {
+	rows, err := q.db.Query(ctx, listEventBookings, arg.EventID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -182,8 +196,8 @@ func (q *Queries) ListEventBookings(ctx context.Context, eventID int64) ([]ListE
 			&i.UserID,
 			&i.EventID,
 			&i.BookedAt,
-			&i.UserEmail,
 			&i.UserName,
+			&i.UserEmail,
 		); err != nil {
 			return nil, err
 		}
@@ -273,12 +287,27 @@ func (q *Queries) ListUpcomingEvents(ctx context.Context, arg ListUpcomingEvents
 }
 
 const listUserBookings = `-- name: ListUserBookings :many
-SELECT eb.id, eb.user_id, eb.event_id, eb.booked_at, e.name as event_name, e.place as event_place, e.date as event_date
+SELECT 
+  eb.id,
+  eb.user_id,
+  eb.event_id,
+  eb.booked_at,
+  e.name as event_name,
+  e.place as event_place,
+  e.date as event_date
 FROM event_bookings eb
 JOIN events e ON eb.event_id = e.id
 WHERE eb.user_id = $1
-ORDER BY e.date ASC
+ORDER BY eb.booked_at DESC
+LIMIT $2
+OFFSET $3
 `
+
+type ListUserBookingsParams struct {
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
 
 type ListUserBookingsRow struct {
 	ID         int64     `json:"id"`
@@ -290,8 +319,8 @@ type ListUserBookingsRow struct {
 	EventDate  time.Time `json:"event_date"`
 }
 
-func (q *Queries) ListUserBookings(ctx context.Context, userID int64) ([]ListUserBookingsRow, error) {
-	rows, err := q.db.Query(ctx, listUserBookings, userID)
+func (q *Queries) ListUserBookings(ctx context.Context, arg ListUserBookingsParams) ([]ListUserBookingsRow, error) {
+	rows, err := q.db.Query(ctx, listUserBookings, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

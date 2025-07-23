@@ -249,7 +249,12 @@ func TestListUserBookings(t *testing.T) {
 	}
 
 	// List user bookings
-	bookings, err := testStore.ListUserBookings(context.Background(), user.ID)
+	arg := ListUserBookingsParams{
+		UserID: user.ID,
+		Limit:  10,
+		Offset: 0,
+	}
+	bookings, err := testStore.ListUserBookings(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, bookings, 3)
 
@@ -281,7 +286,12 @@ func TestListEventBookings(t *testing.T) {
 	}
 
 	// List event bookings
-	bookings, err := testStore.ListEventBookings(context.Background(), event.ID)
+	arg := ListEventBookingsParams{
+		EventID: event.ID,
+		Limit:   10,
+		Offset:  0,
+	}
+	bookings, err := testStore.ListEventBookings(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, bookings, 3)
 
@@ -289,6 +299,7 @@ func TestListEventBookings(t *testing.T) {
 	for _, booking := range bookings {
 		require.Equal(t, event.ID, booking.EventID)
 		require.NotEmpty(t, booking.UserEmail)
-		require.NotEmpty(t, booking.UserName)
+		require.True(t, booking.UserName.Valid)
+		require.NotEmpty(t, booking.UserName.String)
 	}
 }

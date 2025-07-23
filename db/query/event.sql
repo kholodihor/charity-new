@@ -54,18 +54,35 @@ SELECT * FROM event_bookings
 WHERE user_id = $1 AND event_id = $2 LIMIT 1;
 
 -- name: ListUserBookings :many
-SELECT eb.*, e.name as event_name, e.place as event_place, e.date as event_date
+SELECT 
+  eb.id,
+  eb.user_id,
+  eb.event_id,
+  eb.booked_at,
+  e.name as event_name,
+  e.place as event_place,
+  e.date as event_date
 FROM event_bookings eb
 JOIN events e ON eb.event_id = e.id
 WHERE eb.user_id = $1
-ORDER BY e.date ASC;
+ORDER BY eb.booked_at DESC
+LIMIT $2
+OFFSET $3;
 
 -- name: ListEventBookings :many
-SELECT eb.*, u.email as user_email, u.name as user_name
+SELECT 
+  eb.id,
+  eb.user_id,
+  eb.event_id,
+  eb.booked_at,
+  u.name as user_name,
+  u.email as user_email
 FROM event_bookings eb
 JOIN users u ON eb.user_id = u.id
 WHERE eb.event_id = $1
-ORDER BY eb.booked_at ASC;
+ORDER BY eb.booked_at DESC
+LIMIT $2
+OFFSET $3;
 
 -- name: IsEventBooked :one
 SELECT EXISTS(
