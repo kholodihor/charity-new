@@ -55,28 +55,7 @@ func createRandomGoal(t *testing.T, store Store) Goal {
 	return goal
 }
 
-func createRandomDonation(t *testing.T, store Store, userID int64, goalID int64) Donation {
-	donorID, amount, isAnonymous := util.RandomDonationParams(userID, goalID)
-	arg := CreateDonationParams{
-		UserID:      donorID,
-		GoalID:      goalID,
-		Amount:      amount,
-		IsAnonymous: isAnonymous,
-	}
 
-	donation, err := store.CreateDonation(context.Background(), arg)
-	require.NoError(t, err)
-	require.NotEmpty(t, donation)
-
-	require.Equal(t, arg.UserID, donation.UserID)
-	require.Equal(t, arg.GoalID, donation.GoalID)
-	require.Equal(t, arg.Amount, donation.Amount)
-	require.Equal(t, arg.IsAnonymous, donation.IsAnonymous)
-	require.NotZero(t, donation.ID)
-	require.NotZero(t, donation.CreatedAt)
-
-	return donation
-}
 
 func TestStoreDonateToGoalTx(t *testing.T) {
 	// Create test users and goals

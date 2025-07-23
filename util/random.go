@@ -11,8 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
-
 // RandomInt generates a random integer between min and max
 func RandomInt(min, max int64) int64 {
 	n, _ := rand.Int(rand.Reader, big.NewInt(max-min+1))

@@ -75,10 +75,8 @@ func TestGetUser(t *testing.T) {
 
 func TestListUsers(t *testing.T) {
 	// Create multiple users
-	var createdUsers []User
 	for i := 0; i < 5; i++ {
-		user := createRandomUser(t, testStore)
-		createdUsers = append(createdUsers, user)
+		_ = createRandomUser(t, testStore)
 	}
 
 	arg := ListUsersParams{

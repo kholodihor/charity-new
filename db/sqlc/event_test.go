@@ -234,10 +234,8 @@ func TestListUserBookings(t *testing.T) {
 	user := createRandomUser(t, testStore)
 
 	// Create and book multiple events
-	var events []Event
 	for i := 0; i < 3; i++ {
 		event := createRandomEvent(t, testStore)
-		events = append(events, event)
 
 		bookArg := BookEventParams{
 			UserID:  user.ID,
@@ -271,10 +269,8 @@ func TestListEventBookings(t *testing.T) {
 	event := createRandomEvent(t, testStore)
 
 	// Create multiple users and book the same event
-	var users []User
 	for i := 0; i < 3; i++ {
 		user := createRandomUser(t, testStore)
-		users = append(users, user)
 
 		bookArg := BookEventParams{
 			UserID:  user.ID,
