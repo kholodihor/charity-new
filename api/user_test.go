@@ -41,10 +41,7 @@ func TestCreateUserAPI(t *testing.T) {
 				arg := db.CreateUserParams{
 					Email: user.Email,
 					Name:  user.Name,
-					HashedPassword: pgtype.Text{
-						String: user.HashedPassword.String,
-						Valid:  true,
-					},
+					HashedPassword: user.HashedPassword,
 				}
 				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
@@ -349,10 +346,7 @@ func randomUser(t *testing.T) (user db.User, password string) {
 			String: util.RandomOwner(),
 			Valid:  true,
 		},
-		HashedPassword: pgtype.Text{
-			String: hashedPassword,
-			Valid:  true,
-		},
+		HashedPassword: hashedPassword,
 		Balance:   util.RandomMoney(),
 		CreatedAt: fixedTime,
 	}

@@ -74,10 +74,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 			String: req.Name,
 			Valid:  req.Name != "",
 		},
-		HashedPassword: pgtype.Text{
-			String: hashedPassword,
-			Valid:  true,
-		},
+		HashedPassword: hashedPassword,
 	}
 
 	user, err := server.store.CreateUser(ctx, arg)
@@ -110,12 +107,7 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		return
 	}
 
-	if !user.HashedPassword.Valid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-		return
-	}
-
-	err = util.CheckPassword(req.Password, user.HashedPassword.String)
+	err = util.CheckPassword(req.Password, user.HashedPassword)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return

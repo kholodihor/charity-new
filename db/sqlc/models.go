@@ -53,6 +53,6 @@ type User struct {
 	Email          string      `json:"email"`
 	Name           pgtype.Text `json:"name"`
 	Balance        int64       `json:"balance"`
-	HashedPassword pgtype.Text `json:"hashed_password"`
+	HashedPassword string      `json:"hashed_password"`
 	CreatedAt      time.Time   `json:"created_at"`
 }
