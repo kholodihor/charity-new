@@ -11,10 +11,11 @@ import (
 
 // Server serves HTTP requests for our banking service.
 type Server struct {
-	config     util.Config
-	store      db.Store
-	tokenMaker token.Maker
-	router     *gin.Engine
+	config      util.Config
+	store       db.Store
+	tokenMaker  token.Maker
+	rateLimiter *RateLimiter
+	router      *gin.Engine
 }
 
 // NewServer creates a new HTTP server and set up routing.
@@ -25,9 +26,10 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 	}
 
 	server := &Server{
-		config:     config,
-		store:      store,
-		tokenMaker: tokenMaker,
+		config:      config,
+		store:       store,
+		tokenMaker:  tokenMaker,
+		rateLimiter: NewRateLimiter(config.RateLimitPerMinute),
 	}
 
 	server.setupRouter()
@@ -52,6 +54,9 @@ func (server *Server) setupRouter() {
 	// Public donation routes (read-only)
 	router.GET("/donations", server.listDonations)
 	router.GET("/donations/:id", server.getDonation)
+	
+	// Anonymous donation route (public) with rate limiting
+	router.POST("/donations/anonymous", RateLimitMiddleware(server.rateLimiter), server.createAnonymousDonation)
 
 	// Public user routes (read-only)
 	router.GET("/users", server.listUsers)
@@ -71,16 +76,16 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/goals/:id", server.updateGoal)
 	authRoutes.DELETE("/goals/:id", server.deleteGoal)
 
-	// Donation management
-	authRoutes.POST("/donations", server.createDonation)
+	// Donation management with rate limiting
+	authRoutes.POST("/donations", RateLimitMiddleware(server.rateLimiter), server.createDonation)
 
-	// Event management (admin/authenticated users)
-	authRoutes.POST("/events", server.createEvent)
+	// Event management (admin/authenticated users) with rate limiting
+	authRoutes.POST("/events", RateLimitMiddleware(server.rateLimiter), server.createEvent)
 	authRoutes.PUT("/events/:id", server.updateEvent)
 	authRoutes.DELETE("/events/:id", server.deleteEvent)
 
-	// Event booking management
-	authRoutes.POST("/events/:id/book", server.bookEvent)
+	// Event booking management with rate limiting
+	authRoutes.POST("/events/:id/book", RateLimitMiddleware(server.rateLimiter), server.bookEvent)
 	authRoutes.DELETE("/events/:id/book", server.cancelEventBooking)
 	authRoutes.GET("/events/:id/bookings", server.listEventBookings)
 

@@ -53,6 +53,15 @@ func (server *Server) createDonation(ctx *gin.Context) {
 	// Get user from token
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
+	// Check donation amount limit for registered users
+	if req.Amount > server.config.MaxRegisteredDonation {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "donation amount exceeds maximum limit",
+			"max_amount": server.config.MaxRegisteredDonation,
+		})
+		return
+	}
+
 	// Check if goal exists
 	_, err := server.store.GetGoal(ctx, req.GoalID)
 	if err != nil {
@@ -73,6 +82,58 @@ func (server *Server) createDonation(ctx *gin.Context) {
 		},
 		Amount:      req.Amount,
 		IsAnonymous: req.IsAnonymous,
+	}
+
+	result, err := server.store.DonateToGoalTx(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, newDonationResponse(result.Donation))
+}
+
+type createAnonymousDonationRequest struct {
+	GoalID int64 `json:"goal_id" binding:"required"`
+	Amount int64 `json:"amount" binding:"required,min=1"`
+}
+
+// POST /donations/anonymous
+func (server *Server) createAnonymousDonation(ctx *gin.Context) {
+	var req createAnonymousDonationRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// Check donation amount limit for anonymous donations
+	if req.Amount > server.config.MaxAnonymousDonation {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "donation amount exceeds maximum limit",
+			"max_amount": server.config.MaxAnonymousDonation,
+		})
+		return
+	}
+
+	// Check if goal exists
+	_, err := server.store.GetGoal(ctx, req.GoalID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "goal not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	// Create anonymous donation using transaction
+	arg := db.DonateToGoalTxParams{
+		GoalID: req.GoalID,
+		UserID: pgtype.Int8{
+			Valid: false, // No user ID for anonymous donations
+		},
+		Amount:      req.Amount,
+		IsAnonymous: true, // Always anonymous
 	}
 
 	result, err := server.store.DonateToGoalTx(ctx, arg)

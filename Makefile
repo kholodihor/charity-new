@@ -41,12 +41,30 @@ sqlc:
 test:
 	go test -v -cover -short ./...
 
+test-verbose:
+	go test -v -cover ./...
+
+test-api:
+	go test -v -cover ./api
+
+test-donation-limits:
+	go test -v ./api -run "TestDonationLimits|TestRateLimiting"
+
+test-anonymous-donations:
+	go test -v ./api -run TestCreateAnonymousDonationAPI
+
+test-coverage:
+	go test -v -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+
+test-race:
+	go test -v -race -short ./...
+
 server:
 	go run main.go
 
 mock:
-	mockgen -package mockdb -destination db/mock/store.go github.com/techschool/simplebank/db/sqlc Store
-	mockgen -package mockwk -destination worker/mock/distributor.go github.com/techschool/simplebank/worker TaskDistributor
+	mockgen -package mockdb -destination db/mock/store.go github.com/kholodihor/charity/db/sqlc Store
 
 proto:
 	rm -f pb/*.go

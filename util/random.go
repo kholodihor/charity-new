@@ -98,6 +98,12 @@ func RandomDonationParams(userID, goalID int64) (donorID pgtype.Int8, amount int
 		false
 }
 
+// RandomBool generates a random boolean value
+func RandomBool() bool {
+	n, _ := rand.Int(rand.Reader, big.NewInt(2))
+	return n.Int64() == 1
+}
+
 // RandomEventParams generates random event creation parameters
 func RandomEventParams() (name string, place string, date time.Time) {
 	return "Event " + RandomString(8),

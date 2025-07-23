@@ -3,7 +3,7 @@ CREATE TABLE "users" (
   "email" varchar UNIQUE NOT NULL,
   "name" varchar,
   "balance" bigint NOT NULL DEFAULT 1000000, -- 10,000.00 USD (stored in cents)
-  "hashed_password" varchar,
+  "hashed_password" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 

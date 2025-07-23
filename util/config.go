@@ -14,6 +14,13 @@ type Config struct {
 	ServerAddress       string        `mapstructure:"SERVER_ADDRESS"`
 	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	
+	// Donation limits (in cents)
+	MaxAnonymousDonation int64         `mapstructure:"MAX_ANONYMOUS_DONATION"`
+	MaxRegisteredDonation int64        `mapstructure:"MAX_REGISTERED_DONATION"`
+	
+	// Rate limiting
+	RateLimitPerMinute   int           `mapstructure:"RATE_LIMIT_PER_MINUTE"`
 }
 
 // LoadConfig reads configuration from file or environment variables.
