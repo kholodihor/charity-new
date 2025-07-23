@@ -6,13 +6,11 @@ network:
 postgres:
 	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=charity -d postgres:14-alpine
 
-# We don't need MySQL for this project
-
 createdb:
 	docker exec -it postgres createdb --username=postgres --owner=postgres charity
 
 dropdb:
-	docker exec -it postgres dropdb charity
+	docker exec -it postgres dropdb simple_bank
 
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
@@ -41,30 +39,12 @@ sqlc:
 test:
 	go test -v -cover -short ./...
 
-test-verbose:
-	go test -v -cover ./...
-
-test-api:
-	go test -v -cover ./api
-
-test-donation-limits:
-	go test -v ./api -run "TestDonationLimits|TestRateLimiting"
-
-test-anonymous-donations:
-	go test -v ./api -run TestCreateAnonymousDonationAPI
-
-test-coverage:
-	go test -v -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
-
-test-race:
-	go test -v -race -short ./...
-
 server:
 	go run main.go
 
 mock:
-	mockgen -package mockdb -destination db/mock/store.go github.com/kholodihor/charity/db/sqlc Store
+	mockgen -package mockdb -destination db/mock/store.go github.com/techschool/simplebank/db/sqlc Store
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/techschool/simplebank/worker TaskDistributor
 
 proto:
 	rm -f pb/*.go
