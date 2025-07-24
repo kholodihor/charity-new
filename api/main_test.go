@@ -21,9 +21,10 @@ func newTestServer(t *testing.T, store db.Store) *Server {
 	config := util.Config{
 		TokenSymmetricKey:     util.RandomString(32),
 		AccessTokenDuration:   time.Minute,
-		MaxAnonymousDonation:  1000000,  // $10,000
-		MaxRegisteredDonation: 5000000,  // $50,000
-		RateLimitPerMinute:    1000,     // High limit for testing
+		RefreshTokenDuration:  time.Hour,    // 1 hour for testing
+		MaxAnonymousDonation:  1000000,      // $10,000
+		MaxRegisteredDonation: 5000000,      // $50,000
+		RateLimitPerMinute:    1000,         // High limit for testing
 	}
 
 	server, err := NewServer(config, store)

@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 	db "github.com/kholodihor/charity/db/sqlc"
 )
 
@@ -64,6 +65,20 @@ func (mr *MockStoreMockRecorder) CancelEventBooking(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelEventBooking", reflect.TypeOf((*MockStore)(nil).CancelEventBooking), arg0, arg1)
 }
 
+// CleanupExpiredRefreshTokens mocks base method.
+func (m *MockStore) CleanupExpiredRefreshTokens(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CleanupExpiredRefreshTokens", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CleanupExpiredRefreshTokens indicates an expected call of CleanupExpiredRefreshTokens.
+func (mr *MockStoreMockRecorder) CleanupExpiredRefreshTokens(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CleanupExpiredRefreshTokens", reflect.TypeOf((*MockStore)(nil).CleanupExpiredRefreshTokens), arg0)
+}
+
 // CreateDonation mocks base method.
 func (m *MockStore) CreateDonation(arg0 context.Context, arg1 db.CreateDonationParams) (db.Donation, error) {
 	m.ctrl.T.Helper()
@@ -107,6 +122,21 @@ func (m *MockStore) CreateGoal(arg0 context.Context, arg1 db.CreateGoalParams) (
 func (mr *MockStoreMockRecorder) CreateGoal(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGoal", reflect.TypeOf((*MockStore)(nil).CreateGoal), arg0, arg1)
+}
+
+// CreateRefreshToken mocks base method.
+func (m *MockStore) CreateRefreshToken(arg0 context.Context, arg1 db.CreateRefreshTokenParams) (db.RefreshToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRefreshToken", arg0, arg1)
+	ret0, _ := ret[0].(db.RefreshToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRefreshToken indicates an expected call of CreateRefreshToken.
+func (mr *MockStoreMockRecorder) CreateRefreshToken(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRefreshToken", reflect.TypeOf((*MockStore)(nil).CreateRefreshToken), arg0, arg1)
 }
 
 // CreateUser mocks base method.
@@ -254,6 +284,21 @@ func (m *MockStore) GetGoalForUpdate(arg0 context.Context, arg1 int64) (db.Goal,
 func (mr *MockStoreMockRecorder) GetGoalForUpdate(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGoalForUpdate", reflect.TypeOf((*MockStore)(nil).GetGoalForUpdate), arg0, arg1)
+}
+
+// GetRefreshToken mocks base method.
+func (m *MockStore) GetRefreshToken(arg0 context.Context, arg1 uuid.UUID) (db.RefreshToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRefreshToken", arg0, arg1)
+	ret0, _ := ret[0].(db.RefreshToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRefreshToken indicates an expected call of GetRefreshToken.
+func (mr *MockStoreMockRecorder) GetRefreshToken(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRefreshToken", reflect.TypeOf((*MockStore)(nil).GetRefreshToken), arg0, arg1)
 }
 
 // GetUser mocks base method.
@@ -434,6 +479,34 @@ func (m *MockStore) ListUsers(arg0 context.Context, arg1 db.ListUsersParams) ([]
 func (mr *MockStoreMockRecorder) ListUsers(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockStore)(nil).ListUsers), arg0, arg1)
+}
+
+// RevokeAllUserRefreshTokens mocks base method.
+func (m *MockStore) RevokeAllUserRefreshTokens(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeAllUserRefreshTokens", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeAllUserRefreshTokens indicates an expected call of RevokeAllUserRefreshTokens.
+func (mr *MockStoreMockRecorder) RevokeAllUserRefreshTokens(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeAllUserRefreshTokens", reflect.TypeOf((*MockStore)(nil).RevokeAllUserRefreshTokens), arg0, arg1)
+}
+
+// RevokeRefreshToken mocks base method.
+func (m *MockStore) RevokeRefreshToken(arg0 context.Context, arg1 uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeRefreshToken", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeRefreshToken indicates an expected call of RevokeRefreshToken.
+func (mr *MockStoreMockRecorder) RevokeRefreshToken(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeRefreshToken", reflect.TypeOf((*MockStore)(nil).RevokeRefreshToken), arg0, arg1)
 }
 
 // UpdateEvent mocks base method.

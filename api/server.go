@@ -42,6 +42,10 @@ func (server *Server) setupRouter() {
 	// Public routes
 	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
+	
+	// Auth routes (public)
+	router.POST("/auth/refresh", server.refreshToken)
+	router.POST("/auth/logout", server.logoutUser)
 
 	// Public goal routes (read-only)
 	router.GET("/goals", server.listGoals)
@@ -70,6 +74,9 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/users/me", server.updateCurrentUser)
 	authRoutes.GET("/users/me/donations", server.listUserDonations)
 	authRoutes.GET("/users/me/bookings", server.listUserBookings)
+	
+	// Auth management (protected)
+	authRoutes.POST("/auth/logout-all", server.logoutAllDevices)
 
 	// Goal management (admin/authenticated users)
 	authRoutes.POST("/goals", server.createGoal)

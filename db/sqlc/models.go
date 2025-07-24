@@ -7,6 +7,7 @@ package db
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -46,6 +47,15 @@ type Goal struct {
 	CollectedAmount int64       `json:"collected_amount"`
 	IsActive        bool        `json:"is_active"`
 	CreatedAt       time.Time   `json:"created_at"`
+}
+
+type RefreshToken struct {
+	ID        uuid.UUID          `json:"id"`
+	UserID    int64              `json:"user_id"`
+	TokenID   uuid.UUID          `json:"token_id"`
+	ExpiresAt time.Time          `json:"expires_at"`
+	CreatedAt time.Time          `json:"created_at"`
+	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
 }
 
 type User struct {

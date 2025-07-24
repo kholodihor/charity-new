@@ -23,9 +23,21 @@ func NewJWTMaker(secretKey string) (Maker, error) {
 	return &JWTMaker{secretKey}, nil
 }
 
-// CreateToken creates a new token for a specific userID and duration
+// CreateToken creates a new access token for a specific userID and duration
 func (maker *JWTMaker) CreateToken(userID int64, duration time.Duration) (string, *Payload, error) {
 	payload, err := NewPayload(userID, duration)
+	if err != nil {
+		return "", payload, err
+	}
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	token, err := jwtToken.SignedString([]byte(maker.secretKey))
+	return token, payload, err
+}
+
+// CreateRefreshToken creates a new refresh token for a specific userID and duration
+func (maker *JWTMaker) CreateRefreshToken(userID int64, duration time.Duration) (string, *Payload, error) {
+	payload, err := NewRefreshPayload(userID, duration)
 	if err != nil {
 		return "", payload, err
 	}

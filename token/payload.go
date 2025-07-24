@@ -30,8 +30,18 @@ type Payload struct {
 	ExpiredAt time.Time `json:"expired_at"`
 }
 
-// NewPayload creates a new token payload with a specific userID and duration
+// NewPayload creates a new access token payload with a specific userID and duration
 func NewPayload(userID int64, duration time.Duration) (*Payload, error) {
+	return NewTokenPayload(userID, duration, TokenTypeAccessToken)
+}
+
+// NewRefreshPayload creates a new refresh token payload with a specific userID and duration
+func NewRefreshPayload(userID int64, duration time.Duration) (*Payload, error) {
+	return NewTokenPayload(userID, duration, TokenTypeRefreshToken)
+}
+
+// NewTokenPayload creates a new token payload with a specific userID, duration and token type
+func NewTokenPayload(userID int64, duration time.Duration, tokenType TokenType) (*Payload, error) {
 	tokenID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -39,7 +49,7 @@ func NewPayload(userID int64, duration time.Duration) (*Payload, error) {
 
 	payload := &Payload{
 		ID:        tokenID,
-		Type:      TokenTypeAccessToken,
+		Type:      tokenType,
 		UserID:    userID,
 		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(duration),

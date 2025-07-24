@@ -6,14 +6,18 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	BookEvent(ctx context.Context, arg BookEventParams) (EventBooking, error)
 	CancelEventBooking(ctx context.Context, arg CancelEventBookingParams) error
+	CleanupExpiredRefreshTokens(ctx context.Context) error
 	CreateDonation(ctx context.Context, arg CreateDonationParams) (Donation, error)
 	CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error)
 	CreateGoal(ctx context.Context, arg CreateGoalParams) (Goal, error)
+	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteEvent(ctx context.Context, id int64) error
 	DeleteGoal(ctx context.Context, id int64) error
@@ -23,6 +27,7 @@ type Querier interface {
 	GetEventBooking(ctx context.Context, arg GetEventBookingParams) (EventBooking, error)
 	GetGoal(ctx context.Context, id int64) (Goal, error)
 	GetGoalForUpdate(ctx context.Context, id int64) (Goal, error)
+	GetRefreshToken(ctx context.Context, tokenID uuid.UUID) (RefreshToken, error)
 	GetUser(ctx context.Context, id int64) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	IsEventBooked(ctx context.Context, arg IsEventBookedParams) (bool, error)
@@ -35,6 +40,8 @@ type Querier interface {
 	ListUpcomingEvents(ctx context.Context, arg ListUpcomingEventsParams) ([]Event, error)
 	ListUserBookings(ctx context.Context, arg ListUserBookingsParams) ([]ListUserBookingsRow, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	RevokeAllUserRefreshTokens(ctx context.Context, userID int64) error
+	RevokeRefreshToken(ctx context.Context, tokenID uuid.UUID) error
 	UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error)
 	UpdateGoal(ctx context.Context, arg UpdateGoalParams) (Goal, error)
 	UpdateGoalCollectedAmount(ctx context.Context, arg UpdateGoalCollectedAmountParams) error
