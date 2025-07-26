@@ -69,6 +69,7 @@ jobs:
       - name: Test core API features
         run: |
           go test -v -short ./api -run "TestCreateUserAPI"
-          go test -v -short ./api -run "TestLoginUserAPI"
+          go test -v -short ./api -run "TestLoginUserAPIWithRefresh"
+          go test -v -short ./api -run "TestRefreshTokenAPI"
           go test -v -short ./api -run "TestCreateGoalAPI"
           go test -v -short ./api -run "TestCreateEventAPI"

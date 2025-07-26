@@ -4,7 +4,7 @@ network:
 	docker network create charity-network
 
 postgres:
-	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=charity -d postgres:14-alpine
+	docker run --name postgres --network charity-network -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=charity -d postgres:14-alpine
 
 createdb:
 	docker exec -it postgres createdb --username=postgres --owner=postgres charity
@@ -60,5 +60,8 @@ evans:
 
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+forcepush:
+	git push origin main --force
 
 .PHONY: network postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 new_migration db_docs db_schema sqlc test server mock proto evans redis
